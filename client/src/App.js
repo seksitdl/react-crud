@@ -9,6 +9,7 @@ function App() {
   const [country, setCountry] = useState("");
   const [position, setPosition] = useState("");
   const [wage, setWage] = useState(0);
+  const [newWage, setNewWage] = useState(0);
 
   const [employeeList, setEmployeeList] = useState([]);
 
@@ -36,6 +37,37 @@ function App() {
           wage: wage,
         },
       ]);
+    });
+  };
+
+  const updateEmployeeWage = (id) => {
+    Axios.put("http://localhost:3001/update", { wage: newWage, id: id }).then(
+      (response) => {
+        setEmployeeList(
+          employeeList.map((val) => {
+            return val.id == id
+              ? {
+                  id: val.id,
+                  name: val.name,
+                  country: val.country,
+                  age: val.age,
+                  position: val.position,
+                  wage: newWage,
+                }
+              : val;
+          })
+        );
+      }
+    );
+  };
+
+  const deleteEmployee = (id) => {
+    Axios.delete(`http://localhost:3001/delete/${id}`).then((response) => {
+      setEmployeeList(
+        employeeList.filter((val) => {
+          return val.id != id;
+        })
+      );
     });
   };
 
@@ -109,7 +141,9 @@ function App() {
               }}
             ></input>
           </div>
-          <button className="btn btn-success" onClick={addEmployee}>Add Employee</button>
+          <button className="btn btn-success" onClick={addEmployee}>
+            Add Employee
+          </button>
         </form>
       </div>
       <hr />
@@ -127,6 +161,34 @@ function App() {
                 <p className="card-text">Country: {val.country}</p>
                 <p className="card-text">Position: {val.position}</p>
                 <p className="card-text">Wage: {val.wage}</p>
+                <div className="d-flex">
+                  <input
+                    type="text"
+                    type="number"
+                    style={{ width: "300px" }}
+                    placeholder="1500.."
+                    className="form-control"
+                    onChange={(event) => {
+                      setNewWage(event.target.value);
+                    }}
+                  />
+                  <button
+                    className="btn btn-warning"
+                    onClick={() => {
+                      updateEmployeeWage(val.id);
+                    }}
+                  >
+                    Update
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => {
+                      deleteEmployee(val.id);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
           );
